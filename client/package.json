@@ -1,0 +1,16 @@
+{
+    "name": "peer-video-chat-client",
+    "version": "1.0.0",
+    "private": true,
+    "scripts": {
+        "dev": "next dev -H 0.0.0.0",
+        "build": "next build",
+        "start": "next start -H 0.0.0.0"
+    },
+    "dependencies": {
+        "next": "^16.4.3",
+        "react": "^19.3.1",
+        "react-dom": "^19.3.1",
+        "socket.io-client": "^4.8.4"
+    }
+}
