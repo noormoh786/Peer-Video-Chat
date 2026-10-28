@@ -1,0 +1,40 @@
+# Render blueprint — one repo, both halves of the app, single platform, free.
+#
+# The Socket.IO signaling server cannot run on serverless hosts (Vercel,
+# Netlify Functions): those are request/response with a hard timeout and no
+# persistent connection. It runs here as a web service instead, while the
+# Next.js client is exported as static files and served from Render's CDN.
+services:
+  # Signaling server. Free instances sleep after ~15 minutes idle, so the first
+  # call after a quiet period waits ~30-50s while this boots.
+  - type: web
+    name: peer-video-chat-signaling
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /
+    envVars:
+      - key: NODE_VERSION
+        value: 20.11.1
+
+  # Static client. NEXT_PUBLIC_* values are baked in at build time, so changing
+  # any of them requires a redeploy rather than just a restart.
+  - type: web
+    name: peer-video-chat-client
+    runtime: static
+    buildCommand: cd client && npm install && npm run build
+    staticPublishPath: ./client/out
+    envVars:
+      - key: NODE_VERSION
+        value: 20.11.1
+      # Set to the signaling service URL, e.g. https://peer-video-chat-signaling.onrender.com
+      - key: NEXT_PUBLIC_SERVER_URL
+        sync: false
+      # Optional TURN relay for calls over strict carrier/corporate NATs.
+      - key: NEXT_PUBLIC_TURN_URL
+        sync: false
+      - key: NEXT_PUBLIC_TURN_USERNAME
+        sync: false
+      - key: NEXT_PUBLIC_TURN_CREDENTIAL
+        sync: false
